@@ -1,0 +1,6 @@
+#include<Servo.h>
+Servo servo1;// create the servo object
+
+
+int sensor1inputPin = 0 ;
+int sensor2inputPin = 1 ;
