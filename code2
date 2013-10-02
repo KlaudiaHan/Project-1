@@ -1,1 +1,55 @@
-fff
+
+#include <Servo.h> 
+Servo servo1;  //create the servo object
+
+
+int sensor1inputPin = 0; //light sensor right 
+int sensor2inputPin = 1; //light sensor left 
+int servo1outputPin = 5; //the pin controlling SERVO moto control pin
+int motor1outputPin = 6; //the pin controlling the transistor DC moto control pin
+int sensorHeat=3;        //the value of sensor heat
+
+int sensor1RawValue;     //hold the raw value of light sensor right
+int sensor1ConvValue;    //hold the converted output value of light sensor right
+
+int sensor2RawValue;     //hold the raw value of light sensor left
+int sensor2ConvValue;    //hold the converted output value of light sensor right
+
+int directionValue;      //hold the room value of different between two light sensor
+
+void setup()
+{
+  servo1.attach(servo1outputPin,500,2500); //attach servo moto
+  pinMode(motor1outputPin, OUTPUT);   // define motor1outPutPin is a OUTPUT pin
+  Serial.begin(9600);
+}
+
+
+void loop()
+{
+  sensor1RawValue=analogRead(sensor1inputPin); //read the light sensor right
+  sensor1ConvValue=map(sensor1RawValue,0,1024,0,180); // convert from 0 - 1023 to 0-180
+
+  sensor2RawValue=analogRead(sensor2inputPin); //read the light sensor right
+  sensor2ConvValue=map(sensor2RawValue,0,1024,0,180); // convert from 0 - 1023 to 0-180
+  directionValue = (90-(sensor2ConvValue-sensor1ConvValue))/2;  // caluclate the direction of the servo moto 
+
+  
+  int reading = analogRead(sensorHeat);  //getting the voltage reading from the temperature sensor
+  
+  float voltage = reading * 5.0;        
+  voltage /= 1024.0;                     // converting that reading to voltage
+  
+  float temperatureC = (voltage - 0.5) * 100 ; // now print out the temperature
+
+
+  if(temperatureC>32){
+    analogWrite(motor1outputPin, 60);// turn on the fan 
+    servo1.write(directionValue);    // turn on the servo moto 
+  }else if(temperatureC<28){ 
+    analogWrite(motor1outputPin, 0); // turn off the fan 
+    servo1.write(0);                 // turn off the servo moto 
+  }
+  
+  delay(250);
+}
